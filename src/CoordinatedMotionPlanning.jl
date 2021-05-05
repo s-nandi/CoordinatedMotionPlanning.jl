@@ -1,5 +1,8 @@
 module CoordinatedMotionPlanning
 
-include("test.jl")
+include("simulation.jl")
+
+export Robot, Grid, Configuration
+export traveltime, inbounds
 
 end
