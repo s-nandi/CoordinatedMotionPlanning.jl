@@ -1,21 +1,16 @@
+using DataStructures
+
 const CoordType = Int
 const directions = ["W", "N", "E", "S", "O"]
 const dx = [0, -1, 0, 1, 0]
 const dy = [-1, 0, 1, 0, 0]
+const noop = 5
 
-robot_id = 0
 struct Robot
     x::CoordType
     y::CoordType
     speed::Float32
     id::Int32
-end
-
-function Robot(x, y, speed)
-    global robot_id
-    curr_id = robot_id
-    robot_id += 1
-    Robot(x, y, speed, curr_id)
 end
 
 const grid_too_small_message = "Grid too small; need 2x3 / 3x2 grid or bigger"
@@ -31,10 +26,19 @@ struct Grid
     end
 end
 
-struct Configuration
+mutable struct Configuration
     robots::Vector{Robot}
     grid::Grid
-    Configuration(n_1, n_2) = new([], Grid(n_1, n_2))
+    robot_id::Int32
+    Configuration(n_1, n_2) = new([], Grid(n_1, n_2), 0)
+end
+
+function addrobot!(configuration, x, y, speed=1.)
+    id = configuration.robot_id
+    configuration.robot_id += 1
+    robot = Robot(x, y, speed, id)
+    push!(configuration.robots, robot)
+    robot
 end
 
 const no_free_cell_message = "Cannot place robot on saturated grid"
@@ -46,9 +50,7 @@ function addrandomrobot!(configuration, speed)
         error(no_free_cell_message)
     end
     randomcell = rand(freecells)
-    robot = Robot(randomcell..., speed)
-    push!(configuration.robots, robot)
-    robot
+    addrobot!(configuration, randomcell..., speed)
 end
 
 function addrandomrobot!(configuration)
@@ -56,12 +58,8 @@ function addrandomrobot!(configuration)
     addrandomrobot!(configuration, speed)
 end
 
-function addrobot!(configuration, x, y, speed=1.)
-    push!(configuration.robots, Robot(x, y, speed))
-end
-
-function traveltime(robot, distance)
-    return CoordType(ceil(distance / robot.speed))
+function traveltime(speed, distance)
+    return CoordType(ceil(distance / speed))
 end
 
 function inbounds(robot, grid)
@@ -79,9 +77,10 @@ function transition!(configuration, directions)
     @assert length(directions) == nrobots "The number of given directions must match the number of robots"
     n_1, n_2 = configuration.grid.n_1, configuration.grid.n_2
 
-    max_time_taken = 0
     edges = []
     new_positions = []
+    dsu = IntDisjointSets(nrobots)
+    at_position = Dict((robot.x, robot.y) => i for (i, robot) in enumerate(configuration.robots))
     for i in 1:nrobots
         x_prev, y_prev = configuration.robots[i].x, configuration.robots[i].y
         configuration.robots[i] = moverobot(configuration.robots[i], directions[i])
@@ -92,8 +91,16 @@ function transition!(configuration, directions)
         if (x_prev, y_prev) != (x, y)
             push!(edges, ((x_prev, y_prev), (x, y)))
         end
+        if (x, y) ∈ keys(at_position)
+            blocking_robot = at_position[(x, y)]
+            union!(dsu, i, blocking_robot)
+        end
     end
     for (prev, curr) in edges
         @assert (curr, prev) ∉ edges "Swap operations are not allowed: $curr to $prev and $prev to $curr attempted simultaneously"
     end
+
+    # calculate bottlenecked speed 
+    speeds = [dir == noop ? Inf : robot.speed for (dir, robot) in zip(directions, configuration.robots)]
+    traveltime(minimum(speeds), 1)
 end

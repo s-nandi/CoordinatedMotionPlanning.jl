@@ -74,3 +74,15 @@ end
         testassertion(adjacentconfiguration(), [3, 5, 5, 1])
     end
 end
+
+@testset "Calculate transition time" begin
+    c = Configuration(3, 3)
+    addrobot!(c, 1, 1, 1)
+    addrobot!(c, 1, 2, 1)
+    addrobot!(c, 2, 2, 1)
+    addrobot!(c, 2, 1, 1)
+    addrobot!(c, 3, 3, 0.5)
+    @test isapprox(transition!(c, [3, 4, 1, 2, 5]), 1.)
+    @test isapprox(transition!(c, [4, 1, 2, 3, 2]), 2.)
+    @test isapprox(transition!(c, [5, 5, 5, 5, 2]), 2.)
+end
