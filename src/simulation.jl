@@ -1,5 +1,3 @@
-using DataStructures
-
 const CoordType = Int
 const directions = ["W", "N", "E", "S", "O"]
 const dx = [0, -1, 0, 1, 0]
@@ -103,4 +101,47 @@ function transition!(configuration, directions)
     # calculate bottlenecked speed 
     speeds = [dir == noop ? Inf : robot.speed for (dir, robot) in zip(directions, configuration.robots)]
     traveltime(minimum(speeds), 1)
+end
+
+function toscene(configuration, max_robots)
+    nrobots = length(configuration.robots)
+    @assert nrobots <= max_robots "Cannot have more than $max_robots when visualizing"
+    colors = distinguishable_colors(max_robots)
+
+    scene = []
+    properties = []
+
+    n_1, n_2 = configuration.grid.n_1, configuration.grid.n_2
+    push!(scene, [Point2(0, 0), Point2(n_1, 0), Point2(n_1, n_2), Point2(0, n_2)])
+    push!(properties, box_properties)
+
+    for i in 1:(n_1 - 1)
+        push!(scene, Line(Point2(i, 0), Point2(i, n_2)))
+        push!(properties, box_gridline_properties)
+    end
+    for i in 1:(n_2 - 1)
+        push!(scene, Line(Point2(0, i), Point2(n_1, i)))
+        push!(properties, box_gridline_properties)
+    end
+
+    for (i, robot) in enumerate(configuration.robots)
+        x, y = robot.x, robot.y
+        x -= 0.5
+        y -= 0.5
+        color = colors[i]
+        push!(scene, Point2(x, y))
+        actual_properties = Any[]
+        append!(actual_properties, disk_properties)
+        push!(actual_properties, (:color, color))
+        push!(properties, actual_properties)
+    end
+    scene, properties
+end
+
+function show_configuration(configuration, max_robots = 10)
+    save_frame(toscene(configuration, max_robots)...)
+end
+
+function save_configuration(configuration, ofile, max_robots = 10)
+    visualize_frame(toscene(configuration, max_robots)..., ofile)
 end

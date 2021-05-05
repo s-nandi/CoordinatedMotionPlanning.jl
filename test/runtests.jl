@@ -86,3 +86,10 @@ end
     @test isapprox(transition!(c, [4, 1, 2, 3, 2]), 2.)
     @test isapprox(transition!(c, [5, 5, 5, 5, 2]), 2.)
 end
+
+@testset "Test multi-stop solver" begin
+    n_1, n_2 = 3, 2
+    
+
+
+end
