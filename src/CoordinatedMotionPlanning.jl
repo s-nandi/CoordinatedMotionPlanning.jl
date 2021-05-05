@@ -13,5 +13,6 @@ include("multistop.jl")
 export Configuration
 export addrandomrobot!, addrobot!, transition!
 export show_configuration, save_configuration, animate_frames
+export multistop_solve
 
 end

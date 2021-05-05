@@ -20,3 +20,5 @@
     (CoordinatedMotionPlanning) pkg> instantiate
     ```
 
+# Examples
+The programs in the `/demos` folder can be run directly and independently in the REPL. For live plotting, you might need to use the Julia extensions for Juno or VS Code.

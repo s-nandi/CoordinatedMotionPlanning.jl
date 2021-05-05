@@ -59,7 +59,7 @@ function animate_frames(plots, ofilename)
     anim = @animate for i in 1:nframes
         plot!(plots[i])
     end
-    gif(anim, ofilename, fps = 2)
+    gif(anim, ofilename, fps = 1)
 end
 
 function visualize_frame(scene, properties, ofilename)

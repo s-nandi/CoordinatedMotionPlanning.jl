@@ -103,10 +103,26 @@ function transition!(configuration, directions)
     traveltime(minimum(speeds), 1)
 end
 
+function manhattandistance(p_1, p_2)
+    distance = 0
+    for dim in 1:2
+        distance += abs(p_1[dim] - p_2[dim])
+    end
+    distance
+end
+
+function makespan(configuration_1, configuration_2) 
+    @assert length(configuration_1.robots) == length(configuration_2.robots) "Both configurations must contain the same set of robots"
+    nrobots = length(configuration_1.robots)
+    positionof(robot) = (robot.x, robot.y)
+    distances = [manhattandistance(p1, p2) for (p1, p2) in zip(map(positionof, configuration_1), map(positionof, configuration_2))]
+    maximum(distances)
+end
+
 function toscene(configuration, max_robots)
     nrobots = length(configuration.robots)
     @assert nrobots <= max_robots "Cannot have more than $max_robots when visualizing"
-    colors = distinguishable_colors(max_robots)
+    colors = Colors.distinguishable_colors(max_robots)
 
     scene = []
     properties = []

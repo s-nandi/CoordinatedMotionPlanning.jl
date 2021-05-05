@@ -88,8 +88,12 @@ end
 end
 
 @testset "Test multi-stop solver" begin
-    n_1, n_2 = 3, 2
-    
-
-
+    n_1, n_2 = 3, 3
+    target_states = [
+        [(1, 1), (3, 3), (2, 3)],
+        [(1, 2), (1, 3), (3, 1)],
+        [(2, 1), (1, 1), (1, 2)]
+    ]
+    opt, solution = multistop_solve(n_1, n_2, target_states)
+    @test isapprox(opt, 5)
 end
