@@ -2,7 +2,7 @@ module CoordinatedMotionPlanning
 
 include("simulation.jl")
 
-export Robot, Grid, Configuration
-export traveltime, inbounds
+export Configuration
+export addrandomrobot!, addrobot!, transition!
 
 end
