@@ -2,5 +2,5 @@ using CoordinatedMotionPlanning
 using Test
 
 @testset "CoordinatedMotionPlanning.jl" begin
-    # Write your tests here.
+    @test CoordinatedMotionPlanning.f(3) == 6
 end

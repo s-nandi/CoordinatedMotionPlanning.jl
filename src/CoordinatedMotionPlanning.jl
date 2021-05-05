@@ -1,5 +1,5 @@
 module CoordinatedMotionPlanning
 
-# Write your package code here.
+include("test.jl")
 
 end
