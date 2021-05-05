@@ -1,7 +1,7 @@
 using CoordinatedMotionPlanning
 using Test
 
-dummy = 0.128980438
+const dummy = 0.128980438
 
 @testset "Construction configurations" begin
     @test_throws ErrorException(CoordinatedMotionPlanning.grid_too_small_message) Configuration(1, 1)
